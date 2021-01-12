@@ -1,0 +1,648 @@
+## BFS O(V+E) [Queue] {Iterative}
+
+    start = 0 # any node to start if unspecified
+    visited = [0 for x in range(len(g))] # Array to check for unattainded element
+    queue = [] # We use Queue DS in BFS
+    queue = queue.append(start) # Enqueue first node to start
+    visited[start] = 1 # visited
+        
+    while(queue): # perform the same as set above again and again until all are visited
+            
+        element = queue.pop(0) # element to start with
+        print(element)# print it (BFS)
+            for j in g[element]: # all its adjacents (here dictionary, LL traverse)
+                if(visited[i] == 0): # if unvisited then onyl relevant
+                    visited[i] = 1
+                    queue.append(current.val) # Add to queue for its further common or new adjacent neighbour to BFS
+
+## DFS O(V+E) {Recursive - No Stack}
+
+    visited = [0 for x in range(0, n)]
+    
+    def dfs(graph, visited, v, res):
+        
+        visited[v] = 1
+        res.append(v)
+        
+        for i in graph[v]:
+            if(visited[i] == 0):
+                dfs(graph, visited, i, res)
+        
+        return res
+    
+    res = []
+    res = dfs(graph, visited, 0, res)
+    
+    # Unconnected graph checked here
+    for i in range(0, len(visited)):
+        if(visited[i] == 0):
+            res = dfs(graph, visited, i, res)
+    
+    print(res)
+
+## Cyclicity in directed graph O(V+E)
+    
+    visited = [0 for x in range(0, n)]
+    stack = [0 for x in range(0, n)] # bas naam de dia stack
+    
+    def dfs(graph, visited, stack, v):
+        
+        visited[v] = 1
+        stack[v] = 1
+        
+        # neighbours
+        for i in graph[v]:
+            if(visited[i] == 0):
+                if(dfs(graph, visited, stack, i) == True):
+                    return True
+            elif(stack[i] == 1):
+                return True
+        
+        # Pop back Stack (wapas lelo init jo pehle kiya)
+        stack[v] = 0
+        return False
+    
+    for i in range(0, len(visited)):
+        if(visited[i] == 0):
+            if(dfs(graph, visited, stack, i)):
+                return True
+    
+    return False
+
+## Cyclicity in Undirected Graph O(V+E) -- pretty similiar but only take care of parent child's neighbour check
+
+    visited = [0 for x in range(0, n)]
+    stack = [0 for x in range(0, n)]
+    
+    def dfs(graph, visited, stack, v, parent): # parent
+        visited[v] = 1
+        stack[v] = 1
+        
+        for i in graph[v]:
+            if(parent != i): # check if child's neighbour is not the parent
+                if(visited[i] == 0):
+                    if(dfs(graph, visited, stack, i, v) == 1):
+                        return 1
+                elif(stack[i] == 1):
+                    return 1
+        stack[v] = 0
+        return 0
+    
+    for i in range(0, n):
+        if(visited[i] == 0):
+            if(dfs(g, visited, stack, i, -1)): # default parent -1 (Non existent)
+                return 1
+    return 0
+
+## Dijkstra Algorithm -- https://www.youtube.com/watch?v=ba4YGd7S-TY (Very good explanation) -- O((V+E)log(V)) - Adjacency List
+## Wont work with negative edges (use bellman ford)
+## Dijsktra with Adjacency List -> O(ElogV) <- O((E+V)logV) but E >= V
+## It is said to implement it with priority queue but python does not have we need import but below is basic with no such need
+## Path and min distance both calculated until we find the answer
+## Complexity - O(V^2) and if Adjacency list used - O(E log V)
+    
+    # Graph formed (Adj Matrix) -- used adj matrix, if using adj list only traversal method to find neighbour changes else logic is same
+    testCases = int(input())
+    graph = []
+    while(testCases > 0):
+        vertices = int(input())
+        while(vertices > 0):
+            vertices -= 1
+            temp = list(map(int, input().strip().split()))
+            graph.append(temp)
+        testCases -= 1
+
+    # Target settings
+    temp = list(map(int, input().strip().split()))
+    start = temp[0]
+    end = temp[1]
+
+    # Variables
+    import sys
+    parents = [None for x in range(0, len(graph))] # will help to build path
+
+    # State management
+    visited = [0 for x in range(0, len(graph))]
+    minDistance = [sys.maxsize for x in range(0, len(graph))]
+    minDistance[start] = 0
+
+    # Algorithm design
+    # extract min minDistance 
+    # extracted ka vertex mil gaya 
+    # iss vertex ke saare neighbours ke liye
+    # min distance nikal and compare with their minDistance array value if kam then update
+    # after above check add them to a visited array
+    # update its parent too
+    # do above till end is visited
+
+    # return the minValue one's index (ExtractMin in Heaps)
+    def getMin(arr, visited):
+        minSoFar = sys.maxsize
+        minIndex = -1
+        for i in range(0, len(arr)):
+            if((minSoFar > arr[i]) and (visited[i] == 0)):
+                minSoFar = arr[i]
+                minIndex = i
+        return minIndex
+
+    # Looping through till either end is reached or we run out of visiting nodes (psuedo ends)
+    for i in range(0, len(visited)):
+        if((i == end) and (visited[i] != 0)):
+            # stop here
+            break
+        else:
+            # get neighbours
+            minIndex = getMin(minDistance, visited)
+            visited[minIndex] = 1
+            current = minIndex
+
+            for i in range(0, len(graph)):
+                ## Very Important this part
+                if(((graph[current][i] > 0) and(visited[i] == 0)) and (minDistance[i] > minDistance[current] + graph[current][i])):
+                    minDistance[i] = minDistance[current] + graph[current][i]
+                    parents[i] = current
+    
+    # Answering
+    print(minDistance[end])
+    finalResult = []
+
+    while(end > 0):
+        finalResult.append(end)
+        end = parents[end]
+    finalResult.append(0)
+
+    print(list(reversed(finalResult)))
+
+## Minimum steps to reach target by a Knight -- Using BFS to check for all the available positions
+## Using BFS and Queue Path finding Solution
+    
+    class Cell:
+        def __init__(self, x, y, dist):
+            self.x = x
+            self.y = y
+            self.dist = dist
+
+    # check is knight is inside board
+    def isInside(x,y,n):
+        if((x <= n-1) and (y <= n-1)):
+            if((x >= 0) and (y >= 0)):
+                return True
+        return False
+        
+
+    def minStepsByKnight(knightPos, targetPos, size):
+        # Steps knight can take along x and y
+        dx = [2, 2, -2, -2, 1, 1, -1, -1]
+        dy = [1, -1, 1, -1, 2, -2, 2, -2]
+        # source
+        sx = knightPos[0]
+        sy = knightPos[1]
+        # target    
+        tx = targetPos[0]
+        ty = targetPos[1]
+        # queue
+        Queue = []
+        Queue.append(Cell(sx, sy, 0))
+        # State Management
+        visited = [[0 for x in range(0, size)] for y in range(0, size)]
+        
+        while(Queue):
+            current = Queue.pop(0)
+            
+            for k in range(0, 8): # all possible permutations of position change
+                
+                # Base case i.e. mil gaya
+                if((current.x == tx) and (current.y == ty)):
+                    return current.dist
+                
+                x = current.x + dx[k]
+                y = current.y + dy[k]
+                
+                if((isInside(x,y,size)) and (visited[x][y] == 0)):
+                    visited[x][y] = 1
+                    Queue.append(Cell(x,y,current.dist + 1))
+                
+            
+        testCases = int(input())
+        res = []
+        while(testCases > 0):
+            size = int(input())
+            xySource = list(map(int, input().strip().split()))
+            xyTarget = list(map(int, input().strip().split()))# decrease each by 1 as they start from 1
+            
+            # Adjust for indexing
+            for n in range(0, 2):
+                xySource[n] -= 1
+                xyTarget[n] -= 1
+            
+            # Algorithm - BFS
+            print(minStepsByKnight(xySource, xyTarget ,size))
+            
+            testCases -= 1
+
+# Number of Islands on Ocean (grid)
+    
+    # helper function
+    def isInside(x,y,n,m):
+        if((x>=0) and (x<n)):
+            if((y >= 0) and (y < m)):
+                return True
+            else:
+                return False
+        return False
+    
+    # main dfs algo
+    def dfs(graph, visited, x, y, n, m):
+        
+        visited[x][y] = 0
+        
+        # get neightbours
+        dx = [1, 1, 1, -1, -1, -1, 0, 0]
+        dy = [1, -1, 0, 1, -1, 0, -1, 1]
+        
+        for i in range(0, 8):
+            newX = x + dx[i]
+            newY = y + dy[i]
+            
+            if((isInside(newX, newY, n, m) and visited[newX][newY] == 1)):
+                dfs(graph, visited, newX, newY, n, m)
+        
+        return visited
+    
+    # A is given graph/matrix
+    visited = A # 0 -> visited, 1 -> unvisited
+    
+    ans = 0
+    
+    # Unconnected graphs ke liye (just like simple DFS)
+    for i in range(0, N):
+        for j in range(0, M):
+            if(visited[i][j] == 1):
+                ans += 1
+                visited = dfs(A, visited, i, j, N, M) # updates visited grid (if all 0s then done)
+            
+    
+    return ans
+
+# Same above but with BFS
+
+
+# Topological Sorting -- https://www.geeksforgeeks.org/topological-sorting/
+# Like DFS but usage of stack to get ans
+
+    def topo(visited, v, stack, adj):
+        
+        visited.add(v)
+        
+        for j in adj[v]:
+            if(j not in visited):
+                topo(visited, j, stack, adj)
+        
+        stack.append(v) # this position is very important -- makes topo different from dfs
+        return stack
+    
+    stack = []
+    visited = set() # using this complexity decreases significantly
+    
+    for i in range(0, n):
+        if(i not in visited):
+            stack = topo(visited, i, stack, adj)
+    
+    return list(reversed(stack))
+
+## Rat in a maze
+## similar to path finding
+## This is a tougher problem where all 4 directions are allowed
+## Below is a dfs approach try bfs also later
+
+    def isInside(x,y,n):
+            if(x >= 0 and x < n):
+                if(y < n and y >= 0):
+                    return True
+                else:
+                    return False
+            return False
+        
+    def dfs(x, y, visited, tx, ty, n, ans):
+        
+        if ((x == tx) and (y == ty)):
+            visited[x][y] = 0
+            print(ans)
+        else:
+            visited[x][y] = 0
+            # movements
+            dx = [0, 1, -1, 0]
+            dy = [1, 0, 0, -1]
+            mov = ['D', 'R', 'L', 'U']
+                    
+            for i in range(0, 4):
+                newX = x + dx[i]
+                newY = y + dy[i]
+                
+                if(isInside(newX, newY, n)):
+                    if(visited[newX][newY] == 1): # ye pehle nahi aa sakta error out of bounds aa jaega
+                        ans.append(mov[i])
+                        dfs(newX, newY, visited, tx, ty, n, ans)
+        
+
+    arr =  [[1, 0, 0, 0],
+        [1, 1, 0, 1], 
+        [1, 1, 0, 0],
+        [0, 1, 1, 1]]
+
+    import sys
+    sys.setrecursionlimit(10**6) 
+
+    visited = arr
+
+    startX = 0
+    startY = 0
+    targetX = 4 - 1
+    targetY = 4 - 1
+    dfs(startX, startY, visited, targetX, targetY, 4, [])
+
+## NQueen Problem (Can be done with backtracking effictively)
+
+    global N 
+    N = 4
+
+    def printSolution(board): 
+        for i in range(N): 
+            for j in range(N): 
+                print (board[i][j], end = " ") 
+            print() 
+
+    # A utility function to check if a queen can 
+    # be placed on board[row][col]. Note that this 
+    # function is called when "col" queens are 
+    # already placed in columns from 0 to col -1. 
+    # So we need to check only left side for 
+    # attacking queens 
+    def isSafe(board, row, col): 
+
+        # Check this row on left side 
+        for i in range(col): 
+            if board[row][i] == 1: 
+                return False
+
+        # Check upper diagonal on left side 
+        for i, j in zip(range(row, -1, -1), 
+                        range(col, -1, -1)): 
+            if board[i][j] == 1: 
+                return False
+
+        # Check lower diagonal on left side 
+        for i, j in zip(range(row, N, 1), 
+                        range(col, -1, -1)): 
+            if board[i][j] == 1: 
+                return False
+
+        return True
+
+    def solveNQUtil(board, col): 
+        
+        # base case: If all queens are placed 
+        # then return true 
+        if col >= N: 
+            return True
+
+        # Consider this column and try placing 
+        # this queen in all rows one by one 
+        for i in range(N): 
+
+            if isSafe(board, i, col): 
+                
+                # Place this queen in board[i][col] 
+                board[i][col] = 1
+
+                # recur to place rest of the queens 
+                if solveNQUtil(board, col + 1) == True: 
+                    return True
+
+                # If placing queen in board[i][col 
+                # doesn't lead to a solution, then 
+                # queen from board[i][col] 
+                board[i][col] = 0
+
+        # if the queen can not be placed in any row in 
+        # this colum col then return false 
+        return False
+
+    # This function solves the N Queen problem using 
+    # Backtracking. It mainly uses solveNQUtil() to 
+    # solve the problem. It returns false if queens 
+    # cannot be placed, otherwise return true and 
+    # placement of queens in the form of 1s. 
+    # note that there may be more than one 
+    # solutions, this function prints one of the 
+    # feasible solutions. 
+    def solveNQ(): 
+        board = [ [0, 0, 0, 0], 
+                [0, 0, 0, 0], 
+                [0, 0, 0, 0], 
+                [0, 0, 0, 0] ] 
+
+        if solveNQUtil(board, 0) == False: 
+            print ("Solution does not exist") 
+            return False
+
+        printSolution(board) 
+        return True
+
+    # Driver Code 
+    solveNQ() 
+
+# Bipartite check
+# Both DFS and BFS
+
+    ## BFS --> O(V^2) adj matrix
+    ## BFS --> O(V+E) adj list
+        global visited
+        global red
+        global blue
+        visited = [0 for x in range(0, n)]
+        red = set()
+        blue = set()
+        
+        def bfs(arr, n, v):
+            
+            # Variables
+            start = v
+            queue = []
+            
+            # starting iteration
+            queue.append(start)
+            visited[start] = 1
+            red.add(start)
+            
+            # BFS
+            while(queue):
+                
+                curr = queue.pop(0)
+                
+                for i in range(0, n):
+                    if(arr[curr][i] != 0):
+                        if(visited[i] == 1):
+                            if((curr in red) and (i in red)):
+                                return False
+                            elif((curr in blue) and (i in blue)):
+                                return False
+                        elif(visited[i] == 0):
+                            if(curr in red):
+                                blue.add(i)
+                                visited[i] = 1
+                                queue.append(i)
+                            elif(curr in blue):
+                                red.add(i)
+                                visited[i] = 1
+                                queue.append(i)
+            
+            return True
+        
+        res = False
+        for i in range(0, n):
+            if(visited[i] == 0):
+                if(not bfs(arr, n, i)):
+                    return False
+                res = bfs(arr, n, i)
+        return res
+
+    ## DFS -->
+
+    # DFS O(V^2) adj matrix
+        global red
+        global blue
+        global visited
+        red = set()
+        blue = set()
+        visited = [0 for x in range(0, n)]
+        
+        def dfs(arr, v, visited):
+            for i in range(0, n):
+                if(arr[v][i] != 0):
+                    if(visited[i] == 1):
+                        if(v in red and i in red):
+                            return False
+                        if(v in blue and i in blue):
+                            return False
+                    elif(visited[i] == 0):
+                        if(v in red):
+                            blue.add(i)
+                            visited[i] = 1
+                            return dfs(arr, i, visited)
+                        elif(v in blue):
+                            red.add(i)
+                            visited[i] = 1
+                            return dfs(arr, i, visited)
+            return True
+        
+        
+        for v in range(0, n):
+            if(visited[v] == 0):
+                visited[v] = 1
+                red.add(v)
+                if(not dfs(arr, v, visited)):
+                    return False
+        return True
+
+## Clonning a Graph O(V.E) -- Connected Graph
+
+    # BFS
+    if not node:
+        return node
+    
+    queue = []
+    queue.append(node)
+    
+    visited = {}
+    visited[node] = Node(node.val)
+    
+    while(queue):
+        curr = queue.pop(0)
+        
+        for n in curr.neighbors:
+            if(n not in visited):
+                visited[n] = Node(n.val)
+                queue.append(n)
+            visited[curr].neighbors.append(visited[n])
+    return visited[node]
+    
+    
+    
+    # DFS
+    result = {}
+    
+    def clone(node):
+        # empty
+        if(not node):
+            return node
+        # already present in result i.e. visited
+        elif(node.val in result):
+            return result[node.val]
+        else:
+            ans = Node(val = node.val)
+            result[node.val] = ans
+            for n in node.neighbors:
+                ans.neighbors.append(clone(n))
+            return ans
+    
+    return clone(node)
+    
+
+# Bellman ford O(VE) -- Handle negatives edges (Dynamic prog)
+# Ineffective in negative cycle -- below code detect negative cycle -- theory from youtube and gfg
+
+    testCases = int(input())
+
+    while(testCases > 0):
+        
+        temp = list(map(int, input().strip().split()))
+        v = temp[0]
+        e = temp[1]
+        
+        graph = {}
+        
+        inputs = list(map(int, input().strip().split()))
+        
+        i = 0
+        
+        while(i < 3*e):
+            graph[str(inputs[i]) + '-' + str(inputs[i+1])] = inputs[i+2]
+            i += 3
+        
+        # Bellman ford starts here
+        import sys
+        minDistances = [sys.maxsize for x in range(v)]
+        minDistances[0] = 0
+        
+        for i in range(0, v - 1):
+            for j in graph.keys():
+                nodes = j.split('-')
+                start = int(nodes[0])
+                end = int(nodes[1])
+                weight = graph[j]
+                
+                if(minDistances[start] + weight < minDistances[end]):
+                    minDistances[end] = minDistances[start] + weight
+        
+        negativeCycle = 0
+        for j in graph.keys():
+            nodes = j.split('-')
+            start = int(nodes[0])
+            end = int(nodes[1])
+            weight = graph[j]
+            
+            if(minDistances[start] + weight < minDistances[end]):
+                negativeCycle = 1
+                break
+        
+        print(negativeCycle)
+        
+        testCases -= 1
+
+
+
+        
+        
+
+    

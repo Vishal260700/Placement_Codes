@@ -1,0 +1,49 @@
+# Get Mode Array Updates
+def getmode(A):
+    
+    freqTable = {}
+    
+    for i in range(0, len(A)):
+        if(A[i] not in freqTable):
+            freqTable[A[i]] = 1
+        else:
+            freqTable[A[i]] += 1
+    
+    freq = 0
+    freqIndex = 0
+    
+    for key in freqTable.keys():
+        if(freqTable[key] == freq):
+            freqIndex = min(key, freqIndex)
+        elif(freqTable[key] > freq):
+            freq = freqTable[key]
+            freqIndex = key
+    return freqIndex
+
+res = []
+for i in range(0, len(B)):
+    A[B[i][0]-1] = B[i][1]
+    res.append(getmode(A))
+
+return res
+
+# Build Identical Trees
+def check(A, B, insertions):
+            
+    if(A is None and B is None):
+        return 0
+    
+    if(A is None or B is None):
+        # one is absent
+        # Insert here
+        if(A is None):
+            A = TreeNode(1)
+            return 1 + check(A.right, B.right, insertions) + check(A.left, B.left, insertions)
+        else:
+            return -1
+    else:
+        # Both present whether equal or not
+        # Recursively check else where
+        return check(A.right, B.right, insertions) + check(A.left, B.left, insertions)
+        
+return check(A, B, 0)

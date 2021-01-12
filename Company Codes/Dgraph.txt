@@ -1,0 +1,374 @@
+'''Number of ways to arrange people of type A and type B in a row with k available positions given less than n people of type A can sit consecutively and less than m people of type B can sit consecutively.'''
+n = 3
+m = 2
+k  = 4
+dp = [[[0 for _ in range(n)] for _ in range(2)] for _ in range(k)]
+#0 to n-1 people at k positions
+dp[0][0][1] = 1
+dp[0][1][1] = 1
+for i in range(1,k):
+  for num in [0,1]:
+    other = num^1
+    if num == 0:
+      end = n
+    else:
+      end = m
+    dp[i][num][1] += sum(dp[i-1][other])
+    for new_count in range(1,end):
+      #dp[i][num][1] += dp[i-1][other][new_count]
+      if new_count > 1:
+        dp[i][num][new_count] += dp[i-1][num][new_count - 1]
+ans = 0;
+for num in [0,1]:
+  for new_count in range(1,max(n,m)):
+    ans += dp[-1][num][new_count];
+print(ans)
+
+
+Array Pruning :  Given an array,pick the maximum and second maximum element. If they are the same, delete both of them from the array, else delete the second maximum element and push (maximum-second_maximum) into the array. Find the last remaining element of the array. : Use Max Heap. Pop twice. If they are the same, continue, else push the absolute difference of the top 2 into the heap. Stop when size of heap becomes 1(return remaining element) or 0(return 0).
+
+
+import heapq
+
+Arr = list(map(int, input().strip().split()))
+
+for x in range(0, len(Arr)):
+    Arr[x] = -Arr[x]
+
+# Use Min heap but converted to max heap by negative sign
+heapq.heapify(Arr)
+
+
+while(len(Arr) > 1):
+    maxElement = heapq.heappop(Arr)
+    secondMax = heapq.heappop(Arr)
+    
+    if(maxElement != secondMax):
+        heapq.heappush(Arr, maxElement - secondMax)
+
+print(Arr[0]) if (len(Arr) == 1) else print(0)
+
+Find the count of all pairs of integers in an array such that their sum is a multiple of 60. One element can be present in multiple pairs. For example if the given  array is [20,40,100], answers are [20,40] and [20,100] => Use map.
+
+## C++
+//DGraph IITG Q1
+//Author: Ripunjoy Medhi
+
+#include <bits/stdc++.h> 
+using namespace std; 
+
+ 
+int main() 
+{ 
+    //Standard Input Part
+	int n,i;
+	cin>>n;
+	vector<int>arr(n,0);
+	for(int i=0;i<n;i++) cin>>arr[i];
+	
+	//Answer Part
+	int ans=0; //no of pairs
+	unordered_map<int,int> mp; //storing count of remainders (arr[i]%60)
+	for(i=0;i<n;i++)
+	{
+	    if(arr[i]%60==0)
+	    {
+	        ans+= mp[0]; //Two multiples of 60 can be added together to form another multiple of 60
+	    }
+	    else
+	    {
+	        //If curent guy has remainder= z and there are k guys that we have found earlier
+	        //having remainder= 60-z, then there will be k no of pairs having remainder 0 when divided
+	        //by 60
+	        int tofind= 60-(arr[i]%60);
+    	    if(mp[tofind]>=1)
+    	    {
+    	        ans+=mp[tofind];
+    	    }
+	    }
+	    //we add current guy to our remainders map
+	    mp[arr[i]%60]++;
+	    
+	    
+	}
+	cout<<ans;
+} 
+
+# python
+
+
+Arr = list(map(int, input().strip().split()))
+
+maxK = int(max(Arr)//60) + 1
+
+Dict = {}
+
+for element in Arr:
+    if(element not in Dict):
+        Dict[element] = 1
+    else:
+        Dict[element] += 1
+
+count = 0 
+for element in Arr:
+    K = maxK
+    
+    while(K):
+        need = 60*K - element
+        
+        if(need == element):
+            if(Dict[element] > 1):
+                print(need, element)
+                Dict[need] -= 1
+                Dict[element] -= 1
+                count += 1
+        else:
+            if(need in Dict and Dict[need] > 0):
+                print(need, element)
+                Dict[need] -= 1
+                Dict[element] -= 1
+                count += 1
+        
+        K -= 1
+
+print(count)
+        
+
+1. Cherry Pickup --->Exactly same problem. 741. Cherry Pickup
+
+Perfect Substring: https://www.geeksforgeeks.org/number-substrings-count-character-k/ Please provide optimal solution ---> Prefix sum could u plz explain/ add reference to prefix sum approach
+
+
+def checkFreq(string, k):
+    
+    Dict = {}
+    
+    for char in string:
+        if(char not in Dict):
+            Dict[char] = 1 
+        else:
+            Dict[char] += 1
+    
+    for key in Dict.keys():
+        if(Dict[key] != k):
+            return False
+    
+    return True
+
+string = input()
+
+k = int(input())
+
+count = 0
+for i in range(0, len(string) - k + 1):
+    for j in range(i + k - 1, len(string)):
+        strToCheck = string[i:j+1]
+        if(checkFreq(strToCheck, k)):
+            count += 1
+print(count)
+
+
+https://www.geeksforgeeks.org/maximum-of-minimum-difference-of-all-pairs-from-subsequences-of-given-size (required time complexity=nlogn)
+
+
+def check(Arr, B, mid):
+    
+    count = 1
+    last_pos = Arr[0]
+    
+    for i in range(1, len(Arr)):
+        
+        if(abs(last_pos - Arr[i]) >= mid):
+            count += 1
+            last_pos = Arr[i]
+            
+            if(count == B):
+                return True
+    
+    return False
+
+Arr = list(map(int, input().strip().split()))
+
+B = int(input())
+
+Arr.sort() # sort in nlogn
+
+start = 0
+end = Arr[-1] - Arr[0]
+ans = 0
+
+while(start <= end):
+    
+    mid = (start + end)//2
+    
+    if(check(Arr, B, mid)):
+        start = mid + 1
+        ans = mid
+    else:
+        end = mid - 1 
+
+print(ans)
+# size B, where max diff i.e. max and min element
+
+
+
+# https://imgur.com/a/rOtVHI8
+# solution: https://www.geeksforgeeks.org/find-two-numbers-sum-xor/
+
+def getANDs(XORs, SUMs):
+    
+    ANDs = []
+    
+    for i in range(0, len(XORs)):
+        ANDs.append((SUMs[i] - XORs[i])//2)
+    
+    return ANDs
+
+SUMs = list(map(int, input().strip().split()))
+XORs = list(map(int, input().strip().split()))
+ANDs = getANDs(XORs, SUMs)
+
+print(ANDs)
+
+def getAB(XOR, AND):
+    
+    a = 0
+    b = 0
+    
+    for i in range(64): # 64 bits
+        Xi = (XOR & (1 << i))
+        Ai = (AND & (1 << i))
+        
+        if(Xi == 0 and Ai == 0):
+            pass # both zero
+        
+        elif(Xi == 0 and Ai > 0):
+            # both ones
+            a = (1 << i) | a
+            b = (1 << i) | b
+        
+        elif(Xi > 0 and Ai == 0):
+            # one zero other 1
+            a = (1 << i) | a # b is left zero
+        else: # Xi > 0 and Ai > 0
+            return False, False
+    
+    return a, b
+
+res = []
+for i in range(0, len(XORs)):
+    
+    a,b = getAB(XORs[i], ANDs[i])
+    
+    if(a is False and b is False):
+        res.append(0)
+    else:
+        res.append(2*min(a,b) + 3*max(a,b))
+
+print(res)
+    
+
+## Weighted Job Scheduling
+
+## Recursive - exponential
+class Job():
+    def __init__(self, start, finish, profit):
+        self.start = start
+        self.finish = finish
+        self.profit = profit
+
+jobs = [Job(1, 2, 50), Job(3, 5, 20), Job(6, 19, 100), Job(2, 100, 200)]
+
+def getMaxProfit(jobs):
+    
+    # sort based on finish timings
+    jobs = sorted(jobs, key = lambda x : x.finish)
+    
+    # 2 choices -> select current job if pass certain situations or not select and move on
+    
+    # Recursive
+    def solve(jobs, pointer, parentFinish):
+        
+        if(pointer >= len(jobs)):
+            return 0 
+        
+        if(jobs[pointer].start >= parentFinish):
+            return max(solve(jobs, pointer + 1, parentFinish), solve(jobs, pointer + 1, jobs[pointer].finish) + jobs[pointer].profit)
+        
+        return solve(jobs, pointer + 1, parentFinish)
+    
+    return solve(jobs, 0, -1)
+
+print(getMaxProfit(jobs))
+
+## DP - n^2
+
+class Job():
+    def __init__(self, start, finish, profit):
+        self.start = start
+        self.finish = finish
+        self.profit = profit
+
+jobs = [Job(1, 2, 50), Job(3, 5, 20), Job(6, 19, 100), Job(2, 100, 200)]
+
+def getMaxProfit(jobs):
+    
+    # sort based on finish timings
+    jobs = sorted(jobs, key = lambda x : x.finish)
+    
+    # 2 choices -> select current job if pass certain situations or not select and move on
+    
+    # DP -- memoization
+    
+    DP = [[-1 for x in range(0, len(jobs) + 1)] for y in range(0, jobs[-1].finish + 1)]
+    def solve(jobs, pointer, parentFinish):
+        
+        if(pointer >= len(jobs)):
+            return 0 
+        
+        if(DP[parentFinish][pointer] != -1):
+            return DP[parentFinish][pointer]
+        
+        if(jobs[pointer].start >= parentFinish):
+            DP[parentFinish][pointer] = max(solve(jobs, pointer + 1, parentFinish), solve(jobs, pointer + 1, jobs[pointer].finish) + jobs[pointer].profit)
+            return DP[parentFinish][pointer]
+        
+        DP[parentFinish][pointer] = solve(jobs, pointer + 1, parentFinish)
+        return DP[parentFinish][pointer]
+    
+    return solve(jobs, 0, -1)
+
+print(getMaxProfit(jobs))
+
+# Binary Search - nlogn
+https://www.geeksforgeeks.org/weighted-job-scheduling-log-n-time/
+    
+    
+
+
+## Cheery pickup 
+class Solution(object):
+    def cherryPickup(self, grid):
+        N = len(grid)
+        memo = [[[None] * N for _1 in xrange(N)] for _2 in xrange(N)]
+        def dp(r1, c1, c2):
+            r2 = r1 + c1 - c2
+            if (N == r1 or N == r2 or N == c1 or N == c2 or
+                    grid[r1][c1] == -1 or grid[r2][c2] == -1):
+                return float('-inf')
+            elif r1 == c1 == N-1:
+                return grid[r1][c1]
+            elif memo[r1][c1][c2] is not None:
+                return memo[r1][c1][c2]
+            else:
+                ans = grid[r1][c1] + (c1 != c2) * grid[r2][c2]
+                ans += max(dp(r1, c1+1, c2+1), dp(r1+1, c1, c2+1),
+                           dp(r1, c1+1, c2), dp(r1+1, c1, c2))
+
+            memo[r1][c1][c2] = ans
+            return ans
+
+        return max(0, dp(0, 0, 0))
+    
+    
+    

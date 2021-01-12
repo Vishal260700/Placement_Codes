@@ -1,0 +1,77 @@
+
+Given a matrix (dimensions= m X n)of Strings (“X” and “0”) where “X” represents students who are not interested in playing at all.
+
+and “O” represents the students who are interested in chess. find the maximum possible number of chess games that can take place at the same time in the class.
+
+eg:
+
+3        3
+
+O        O        O
+
+O        X        X
+
+X                   X        X
+
+ans = 2
+
+explanation: these 2 colored pairs are possible
+
+        
+
+O        O        O
+
+O        X        X
+
+X         X        X
+
+def isinside(x, y, graph):
+    if((x >= 0 and x < len(graph)) and (y >= 0 and y < len(graph))):
+        return True
+    return False
+    
+
+def dfs(graph, x, y):
+    
+    graph[y][x] = 'X'
+    res = 0
+    
+    if(isinside(x + 1, y, graph)): # right
+        if(graph[y][x+1] == 'O'):
+            res += (1 + dfs(graph, x+1, y))
+    if(isinside(x - 1, y, graph)): # left
+        if(graph[y][x-1] == 'O'):
+            res += (1 + dfs(graph, x-1, y))
+    if(isinside(x, y + 1, graph)): # down
+        if(graph[y+1][x] == 'O'):
+            res += (1 + dfs(graph, x, y + 1))
+    if(isinside(x, y - 1, graph)): # up
+        if(graph[y-1][x] == 'O'):
+            res += (1 + dfs(graph, x, y - 1))
+    
+    return res
+
+n = int(input())
+rows = n
+graph = []
+
+while(rows):
+    
+    temp = list(input().split())
+    
+    graph.append(temp)
+    
+    rows -= 1
+
+print(graph)
+res = 0
+for y in range(n):
+    for x in range(n):
+        if(graph[y][x] == 'O'):
+            res += ((1 + dfs(graph, x, y))//2) # at the same time so if 3 then one pair possible
+
+print(res)
+    
+    
+    
+    

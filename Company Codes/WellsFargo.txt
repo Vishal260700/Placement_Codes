@@ -1,0 +1,240 @@
+# Max Sum increasing subsequence
+
+# Recursive
+def solve(Arr, pointer, parent):
+    
+    if(pointer >= len(Arr)):
+        return 0
+    
+    if(Arr[pointer] <= parent):
+        return solve(Arr, pointer + 1, parent)
+    
+    return max(solve(Arr, pointer + 1, parent), Arr[pointer] + solve(Arr, pointer + 1, Arr[pointer]))
+
+return solve(nums, 0, -1)
+
+# DP
+DP = [{} for x in range(0, len(nums))]
+        
+def solve(Arr, pointer, parent):
+    
+    if(pointer >= len(Arr)):
+        return 0
+    
+    if(parent in DP[pointer]):
+        return DP[pointer][parent]
+    
+    if(Arr[pointer] <= parent):
+        DP[pointer][parent] = solve(Arr, pointer + 1, parent)
+        return DP[pointer][parent]
+    
+    DP[pointer][parent] = max(solve(Arr, pointer + 1, parent), Arr[pointer] + solve(Arr, pointer + 1, Arr[pointer]))
+    
+    return DP[pointer][parent]
+
+return solve(nums, 0, -1)
+
+# Pattern Searching
+
+# KMP
+
+#code
+
+## KMP
+
+# Helper
+def lpsGenerator(subString):
+    
+    lpsArr = [0 for x in range(0, len(subString))]
+    i = 1
+    length = 0
+    
+    while(i < len(subString)):
+        
+        if(subString[i] == subString[length]):
+            lpsArr[i] = length + 1
+            i += 1
+            length += 1 
+        else:
+            if(length != 0):
+                length = lpsArr[length - 1]
+            else:
+                lpsArr[i] = 0
+                i += 1
+    
+    return lpsArr
+
+def KMP(subString, mainString):
+    
+    lpsArr = lpsGenerator(subString)
+    
+    i = 0
+    j = 0
+    count = 0
+    while(i <= len(mainString) - len(subString) + 1):
+        if(mainString[i] == subString[j]):
+            i += 1
+            j += 1
+        else:
+            if(j != 0):
+                j = lpsArr[j - 1]
+            else:
+                i += 1
+        if(j == len(subString)):
+            count += 1
+            j = lpsArr[j - 1]
+    return count
+
+print(lpsGenerator('onion'))
+print(KMP('ab', 'abcdabedabefa'))
+        
+        
+## Logs Question
+
+We have N logs of lengths A1,A2,⋯AN
+
+We can cut these logs at most K
+times in total. When a log of length L is cut at a point whose distance from an end of the log is t (0<t<L), it becomes two logs of lengths t and L−t
+
+Find the shortest possible length of the longest log after at most K
+cuts, and print it after rounding up to an integer.
+
+# Code
+n, k = map(int, input().strip().split())
+Arr = list(map(int, input().strip().split()))
+
+def ok(x):
+    
+    count = 0
+    
+    for i in range(0, n):
+        count += Arr[i]//x
+        if(Arr[i]%x == 0):
+            count -= 1
+    if(count <= k):
+        return True
+    else:
+        return False
+
+left = 0
+right = max(Arr)
+mid = 0
+
+while(right - left > 1):
+    
+    mid = (left + right)//2
+    
+    if(ok(mid)):
+        right = mid
+    else:
+        left = mid
+
+print(right)
+
+# Angry Animals
+# Prob - https://www.quora.com/What-is-the-solution-of-Angry-Animals-problem
+
+## Angry Animals
+Animals = [1, 2, 3]
+
+Enemies = [(1, 3), (2, 3)]
+
+Dict = {}
+
+for pair in Enemies:
+    if(pair[0] not in Dict):
+        Dict[pair[0]] = {pair[1] : 1}
+    else:
+        Dict[pair[0]][pair[1]] = 1
+    if(pair[1] not in Dict):
+        Dict[pair[1]] = {pair[0] : 1}
+    else:
+        Dict[pair[1]][pair[0]] = 1
+
+Queue = {}
+count = 0
+for i in range(0, len(Animals)):
+    
+    if(Animals[i] not in Dict):
+        # No Enemies
+        Queue[Animals[i]] = 1
+        count += 1
+    else:
+        # Have enemies
+        Flag = True
+        for potEnemy in Dict[Animals[i]]:
+            if(potEnemy in Queue):
+                Flag = False
+                del Queue[potEnemy]
+                count = count + len(Queue)
+        if(Flag):
+            Queue[Animals[i]] = 1
+        count += 1
+
+if(len(Queue)):
+    count = count + (len(Queue)*(len(Queue) - 1))//2
+
+print(count)
+
+## Min loss - https://www.hackerrank.com/challenges/minimum-loss/problem
+
+# O(nlogn) - sort and hashmap
+Dict = {}
+for i in range(0, len(price)):
+    if(price[i] not in Dict):
+        Dict[price[i]] = i
+
+price = list(sorted(price, reverse = True))
+minLoss = 2**31 - 1
+for i in range(0, len(price) - 1):
+    if(Dict[price[i]] < Dict[price[i+1]]):
+        minLoss = min(minLoss, abs(price[i] - price[i+1]))
+
+return minLoss
+
+
+# O(n^2)
+minLoss = 2**31 - 1
+
+for i in range(0, len(price)-1):
+    for j in range(i + 1, len(price)):
+        if(price[j] <= price[i]):
+            tempMax = price[i] - price[j]
+            minLoss = min(tempMax, minLoss)
+
+return minLoss
+
+# Player Selection - given a list of players with skill levels, make a team of playrs with skill level lieing in a range low to high inclusive
+# min number of players in teams is K(given)
+
+skills = list(map(int, input().strip().split()))
+
+RangeLow, RangeHigh = map(int, input().strip().split())
+
+k = int(input())
+
+count = 0
+for skill in skills:
+    if(skill >= RangeLow and skill <= RangeHigh):
+        count += 1 
+
+def ncr(n, r):
+    
+    return (fact(n))/(fact(n-r)*fact(r))
+
+def fact(x):
+    
+    res = 1 
+    
+    for i in range(1, x + 1):
+        res = res * i
+    
+    return res
+
+ans = 0
+for r in range(k, count+1):
+    ans += ncr(count, r)
+
+print(ans)
+
+## Ad-hoc Graph Question

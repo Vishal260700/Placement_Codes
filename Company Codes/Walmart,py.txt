@@ -1,0 +1,157 @@
+# Smallest window with max distinct elements -- saare distinct in given string khelaegi smallest window
+testCases = int(input())
+
+while(testCases):
+    
+    string = input()
+    
+    distinct = set()
+    
+    for char in string:
+        if(char not in distinct):
+            distinct.add(char)
+    
+    elems = len(distinct)
+    
+    count = 0
+    start = 0
+    minWindowSize = 2**31 - 1
+    Dict = {}
+    
+    i = 0
+    
+    while(i < len(string)):
+        if(string[i] not in Dict):
+            Dict[string[i]] = 1
+            i += 1
+            count += 1
+        else:
+            Dict[string[i]] += 1
+            i += 1
+        
+        if(count == elems):
+            while(Dict[string[start]] > 1):
+                Dict[string[start]] -= 1
+                start += 1
+            
+            windowSize = i - start
+            
+            if(minWindowSize > windowSize):
+                minWindowSize = windowSize
+                startIndex = start
+    
+    print(string[startIndex: startIndex + count + 1])
+    print(minWindowSize)
+    
+    testCases -= 1
+
+## Check if a number has bits in alternate fashion
+N = int(input())
+
+def check(n):
+    prev = -1
+    while(n):
+        curr = n%2
+        n = n//2
+        if(curr == prev):
+            return False
+        else:
+            prev = curr
+    return True
+
+print ('YES' if(check(N)) else 'NO')
+
+# XOR between L and R
+left = int(input())
+right = int(input())
+
+# Truth Table
+# 0 xor 0 -> 0
+# 0 xor 1 -> 1
+# 1 xor 0 -> 1 
+# 0 xor 0 -> 0
+def getXOR(n):
+    rem = n%4
+    if(rem == 0):
+        return n
+    elif(rem == 1):
+        return 1
+    elif(rem == 2):
+        return n+1
+    else:
+        return 0
+# between L to R -> F(R) ^ F(L-1)
+print(getXOR(right) ^ getXOR(left-1))
+
+
+# Min number of days to eat N oranges
+
+# Gawd DP - O(logn)
+DP = {}
+def solveGAWD_DP(n):
+    # Base Case
+    if(n == 1):
+        return 1
+    if(n == 2 or n == 3):
+        return 2
+    # Memoization
+    if(n in DP):
+        return DP[n]
+    
+    DP[n] = min(n%2 + 1 + solveGAWD_DP(n//2), n%3 + 1 + solveGAWD_DP(n//3))
+    return DP[n]
+
+return solveGAWD_DP(n)
+        
+
+# DP - O(N^2)
+DP = [-1 for x in range(0, n+1)]
+def solveDP(n):
+    
+    if(n == 0):
+        return 0
+    
+    if(DP[n] != -1):
+        return DP[n]
+    
+    DP[n-1] = 1 + solveDP(n - 1)
+    Ones = DP[n-1]
+    
+    Twos = 2**31 - 1
+    Threes = 2**31 - 1
+    
+    if(n % 2 == 0):
+        if(DP[n//2] == -1):
+            DP[n//2] = 1 + solveDP(n//2)
+        Twos = DP[n//2]
+    
+    if(n % 3 == 0):
+        if(DP[n//3] == -1):
+            DP[n//3] = 1 + solveDP(n//3)
+        Threes = DP[n//3]
+    
+    return min([Ones, Twos, Threes])
+
+return (solveDP(n))
+
+
+# Recursive - Exponential
+def solve(n):
+    
+    if(n == 0):
+        return 0
+    
+    ones = 1 + solve(n - 1)
+    Twos = 2**31 - 1
+    Threes = 2**31 - 1
+    
+    if(n % 2 == 0):
+        Twos = 1 + solve(n//2)
+    
+    if(n % 3 == 0):
+        Threes = 1 + solve(n//3)
+    
+    return min([ones, Twos, Threes])
+
+return (solve(n))
+
